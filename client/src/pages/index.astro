@@ -1,147 +1,132 @@
 ---
+import '@fontsource-variable/geist';
+import '@fontsource-variable/geist-mono';
+import '../styles/global.css';
+---
 
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
-		<title>URL Shortener</title>
+		<meta name="description" content="Turn long URLs into compact, shareable links." />
+		<meta name="theme-color" content="#f4f4f5" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+		<title>Trim | URL shortener</title>
 	</head>
-	<body>
-		<main class="card">
-			<h1>URL Shortener</h1>
-			<p class="subtitle">Paste a long link and get a short one.</p>
+	<body class="min-h-dvh font-sans">
+		<div class="mx-auto flex min-h-dvh max-w-6xl flex-col px-5 sm:px-8">
+			<header class="flex items-center pt-7">
+				<a href="/" class="text-[0.95rem] font-semibold tracking-tight">
+					trim<span class="text-amber-700 dark:text-amber-400">.</span>
+				</a>
+			</header>
 
-			<form id="shorten-form">
-				<input
-					id="url-input"
-					type="url"
-					placeholder="https://example.com/very/long/path"
-					required
-				/>
-				<button type="submit" id="shorten-btn">Shorten</button>
-			</form>
+			<main class="flex flex-1 items-center py-12 sm:py-16">
+				<section
+					class="grid w-full items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20"
+				>
+					<div class="rise max-w-xl">
+						<h1
+							class="text-4xl font-semibold leading-[1.05] tracking-tight text-balance sm:text-5xl lg:text-6xl"
+						>
+							Make long links <span class="text-amber-700 dark:text-amber-400">short</span>.
+						</h1>
+						<p
+							class="mt-5 max-w-[46ch] text-base leading-relaxed text-zinc-600 sm:text-lg dark:text-zinc-400"
+						>
+							Paste a URL and get a compact link you can share. Links expire after
+							24 hours by default.
+						</p>
+					</div>
 
-			<div id="result" hidden>
-				<p class="label">Your short link</p>
-				<a id="short-link" href="#" target="_blank" rel="noopener"></a>
-				<p id="original-url" class="muted"></p>
-				<p id="expiry" class="muted"></p>
-			</div>
+					<div class="rise-delayed">
+						<div
+							class="rounded-xl border border-zinc-200 bg-zinc-50 p-6 shadow-[0_18px_40px_-24px_rgba(24,24,27,0.35)] sm:p-7 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.85)]"
+						>
+							<form id="shorten-form" class="flex flex-col gap-2">
+								<label
+									for="url-input"
+									class="text-sm font-medium text-zinc-700 dark:text-zinc-300"
+								>
+									Long URL
+								</label>
+								<div class="flex flex-col gap-2 sm:flex-row">
+									<input
+										id="url-input"
+										name="originalUrl"
+										type="url"
+										inputmode="url"
+										autocomplete="url"
+										spellcheck="false"
+										placeholder="https://example.com/a/very/long/path"
+										aria-describedby="url-help"
+										required
+										class="w-full flex-1 rounded-xl border border-zinc-400 bg-transparent px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-amber-500 disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-100 dark:placeholder:text-zinc-400 dark:focus:border-amber-400"
+									/>
+									<button
+										type="submit"
+										id="shorten-btn"
+										class="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 transition-transform duration-150 hover:bg-amber-400 focus-visible:outline-zinc-900 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 sm:w-40 dark:focus-visible:outline-zinc-50"
+									>
+										Shorten
+									</button>
+								</div>
+								<p id="url-help" class="text-xs text-zinc-500 dark:text-zinc-400">
+									Include the full link, starting with https://
+								</p>
+							</form>
 
-			<p id="error" class="error" hidden></p>
-		</main>
-	<script src="/src/scripts/shorten.ts"></script>
+							<p
+								id="error"
+								role="alert"
+								hidden
+								class="reveal mt-4 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
+							></p>
+
+							<div
+								id="result"
+								hidden
+								aria-live="polite"
+								class="reveal mt-5 border-t border-zinc-200 pt-5 dark:border-zinc-800"
+							>
+								<p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+									Your short link
+								</p>
+								<a
+									id="short-link"
+									href="#"
+									target="_blank"
+									rel="noopener"
+									class="mt-2 block break-all font-mono text-sm font-medium text-amber-700 underline underline-offset-4 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300"
+								></a>
+								<dl class="mt-4 space-y-1.5 text-xs text-zinc-600 dark:text-zinc-300">
+									<div class="flex gap-2">
+										<dt class="shrink-0 text-zinc-500 dark:text-zinc-400">Original</dt>
+										<dd id="original-url" class="break-all"></dd>
+									</div>
+									<div class="flex gap-2">
+										<dt class="shrink-0 text-zinc-500 dark:text-zinc-400">Expires</dt>
+										<dd id="expiry"></dd>
+									</div>
+								</dl>
+							</div>
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<footer
+				class="border-t border-zinc-200 py-6 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400"
+			>
+				Links are stored as-is. Do not paste anything sensitive.
+			</footer>
+		</div>
+
+		<script>
+			import '../scripts/shorten.ts';
+		</script>
 	</body>
 </html>
-
-<style>
-	:root {
-		color-scheme: light dark;
-	}
-
-	* {
-		box-sizing: border-box;
-	}
-
-	body {
-		margin: 0;
-		min-height: 100vh;
-		display: grid;
-		place-items: center;
-		font-family: system-ui, sans-serif;
-		background: #f4f4f5;
-	}
-
-	@media (prefers-color-scheme: dark) {
-		body {
-			background: #18181b;
-		}
-	}
-
-	.card {
-		width: min(480px, 90vw);
-		padding: 2rem;
-		border-radius: 12px;
-		background: #fff;
-		box-shadow: 0 10px 24px rgb(0 0 0 / 0.08);
-	}
-
-	@media (prefers-color-scheme: dark) {
-		.card {
-			background: #27272a;
-		}
-	}
-
-	h1 {
-		margin: 0 0 0.25rem;
-		font-size: 1.5rem;
-	}
-
-	.subtitle {
-		margin: 0 0 1.5rem;
-		color: #71717a;
-	}
-
-	form {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	input {
-		flex: 1;
-		padding: 0.6rem 0.75rem;
-		border: 1px solid #a1a1aa;
-		border-radius: 8px;
-		font-size: 1rem;
-		background: transparent;
-		color: inherit;
-	}
-
-	button {
-		padding: 0.6rem 1rem;
-		border: 0;
-		border-radius: 8px;
-		background: #2563eb;
-		color: #fff;
-		font-size: 1rem;
-		font-weight: 600;
-		cursor: pointer;
-	}
-
-	button:disabled {
-		opacity: 0.6;
-		cursor: default;
-	}
-
-	#result {
-		margin-top: 1.5rem;
-	}
-
-	.label {
-		margin: 0 0 0.25rem;
-		font-size: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: #71717a;
-	}
-
-	#short-link {
-		font-weight: 600;
-		color: #2563eb;
-		word-break: break-all;
-	}
-
-	.muted {
-		margin: 0.25rem 0 0;
-		color: #71717a;
-		font-size: 0.85rem;
-		word-break: break-all;
-	}
-
-	.error {
-		margin-top: 1.5rem;
-		color: #dc2626;
-	}
-</style>
