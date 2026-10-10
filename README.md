@@ -1,4 +1,4 @@
-# URL Shortener
+# trim
 
 A minimal URL shortener MVP: a web client, two API services, and an API gateway in front of PostgreSQL.
 
