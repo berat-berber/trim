@@ -43,13 +43,13 @@ Prerequisites: Docker with Compose.
 docker compose up --build -d
 ```
 
-Then open [http://localhost:8080](http://localhost:8080).
+Then open [http://localhost](http://localhost).
 
-Services listen on a private network; only the gateway is exposed on `:8080` (client page + API). Postgres is not published to the host.
+Services listen on a private network; only the gateway is exposed on `:80` (client page + API). Postgres is not published to the host.
 
 ### Config
 
-- `PUBLIC_API_URL` (gateway build arg, default `http://localhost:8080`) — base URL the browser uses for API calls.
+- `PUBLIC_API_URL` (gateway build arg, default `http://localhost`) — base URL the browser uses for API calls. Override it when deploying so the client calls the API on the origin the page is served from, e.g. `PUBLIC_API_URL=https://your-domain docker compose up --build -d`.
 - Database connection strings are injected into the .NET services via `ConnectionStrings__devDatabase`.
 - Local dev: copy `client/.env.example` to `client/.env` for the Astro dev server.
 

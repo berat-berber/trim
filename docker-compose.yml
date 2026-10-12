@@ -35,9 +35,9 @@ services:
       context: .
       dockerfile: gateway/Dockerfile
       args:
-        PUBLIC_API_URL: http://localhost:8080
+        PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost}
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - write-service
       - read-service
