@@ -39,6 +39,8 @@ Request flow:
 
 Prerequisites: Docker with Compose.
 
+### Local development
+
 ```bash
 docker compose up --build -d
 ```
@@ -47,9 +49,30 @@ Then open [http://localhost](http://localhost).
 
 Services listen on a private network; only the gateway is exposed on `:80` (client page + API). Postgres is not published to the host.
 
+### Production
+
+The two API service images are built and pushed to the GitHub Container Registry by CI (`.github/workflows/publish-services.yml`, on every push to `main` that touches `services/**`):
+
+| Image | Built |
+|---|---|
+| `ghcr.io/berat-berber/trim-write-service` | CI (GHCR) |
+| `ghcr.io/berat-berber/trim-read-service` | CI (GHCR) |
+| reverse-proxy (nginx + Astro client) | always built on the host |
+
+The gateway image is never pulled: `PUBLIC_API_URL` is baked into the static Astro bundle at build time, so it has to be rebuilt against the target environment's `.env` on every deploy. The packages are public, so no registry login is required to pull.
+
+Deploy on the server (after `git pull`):
+
+```bash
+docker compose -f compose.prod.yml pull --ignore-buildable
+docker compose -f compose.prod.yml up -d --build
+```
+
+`--ignore-buildable` skips the gateway during `pull` (it has no `image:`, only `build:`); `--build` rebuilds it.
+
 ### Config
 
-- `PUBLIC_API_URL` (gateway build arg, default `http://localhost`) — base URL the browser uses for API calls. Override it when deploying so the client calls the API on the origin the page is served from, e.g. `PUBLIC_API_URL=https://your-domain docker compose up --build -d`.
+- `PUBLIC_API_URL` (gateway build arg, default `http://localhost`) — base URL the browser uses for API calls. Override it when deploying so the client calls the API on the origin the page is served from, e.g. `PUBLIC_API_URL=https://your-domain docker compose up --build -d` (production reads it from `.env`).
 - Database connection strings are injected into the .NET services via `ConnectionStrings__devDatabase`.
 - Local dev: copy `client/.env.example` to `client/.env` for the Astro dev server.
 
