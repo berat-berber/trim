@@ -1,9 +1,9 @@
 .git
-client/node_modules
-client/dist
-client/.astro
 **/bin
 **/obj
+**/node_modules
+client/dist
 .env
 .env.*
 *.md
+compose.*.yml

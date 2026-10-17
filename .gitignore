@@ -1,18 +1,12 @@
-# .NET
-**/bin/
-**/obj/
-*.user
-
-# Node / Astro
-client/node_modules/
-client/dist/
-client/.astro/
-
-# Environment
+# Secrets
 .env
 .env.*
 !.env.example
 
-# OS
-.DS_Store
-Thumbs.db
+# .NET
+**/bin
+**/obj
+
+# Node
+**/node_modules
+client/dist

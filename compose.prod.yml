@@ -1,0 +1,53 @@
+name: trim-prod
+
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      start_period: 10s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  write-service:
+    build: ./services/writeService
+    environment:
+      db: Host=database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  read-service:
+    build: ./services/readService
+    environment:
+      db: Host=database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  reverse-proxy:
+    build:
+      context: .
+      dockerfile: reverse-proxy/Dockerfile
+      args:
+        PUBLIC_API_URL: ${PUBLIC_API_URL}
+    ports:
+      - "80:80"
+    depends_on:
+      - write-service
+      - read-service
+    restart: unless-stopped
+
+volumes:
+  pgdata:
