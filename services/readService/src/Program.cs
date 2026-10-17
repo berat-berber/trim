@@ -10,8 +10,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 builder.Services.AddSingleton(x =>
-    NpgsqlDataSource.Create(builder.Configuration.GetConnectionString("devDatabase")
-        ?? throw new InvalidOperationException("Connection string 'devDatabase' is not configured.")));
+    NpgsqlDataSource.Create(builder.Configuration["db"]
+        ?? throw new InvalidOperationException("db connection string is not configured.")));
 
 var app = builder.Build();
 
@@ -22,11 +22,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+
 app.UseStatusCodePages();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

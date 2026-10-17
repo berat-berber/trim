@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using src.Data;
 using src.Services;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +13,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("devDatabase")
-        ?? throw new InvalidOperationException("Connection string 'devDatabase' is not configured.")));
-
+    options.UseNpgsql(builder.Configuration["db"] 
+        ?? throw new InvalidOperationException("db connection string is not configured.")));
     
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerService>();
 
@@ -27,11 +27,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler();
+
 app.UseStatusCodePages();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 
