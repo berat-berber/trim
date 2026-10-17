@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   write-service:
-    build: ./services/writeService
+    image: ghcr.io/berat-berber/trim-write-service:latest
     environment:
       db: Host=database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     depends_on:
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   read-service:
-    build: ./services/readService
+    image: ghcr.io/berat-berber/trim-read-service:latest
     environment:
       db: Host=database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     depends_on:
