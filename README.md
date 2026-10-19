@@ -47,7 +47,7 @@ Prerequisites: Docker with Compose.
 ### Local development
 
 ```bash
-docker compose up --build -d
+docker compose -f compose.dev.yml up --build -d
 ```
 
 Then open [http://localhost](http://localhost).
