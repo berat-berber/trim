@@ -8,6 +8,11 @@ A minimal URL shortener MVP: a web client, two API services, and a reverse proxy
 Browser
    │
    ▼
+┌──────────────┐
+│  Cloudflare  │
+└──────┬───────┘
+       │
+       ▼
 ┌───────────────┐   /api/urls (POST)      ┌────────────────┐
 │  NGINX        │ ───────────────────────▶│  write-service │
 │ reverse proxy │                         │  (.NET, EF)    │
@@ -16,18 +21,18 @@ Browser
 │  statically)  │                         │  (.NET, Dapper)│
 └───────────────┘                         └───────┬────────┘
                                                   │
-                                             ┌────▼────┐
-                                             │PostgreSQL│
-                                             └─────────┘
+                                             ┌────▼──────┐
+                                             │PostgreSQL │
+                                             └───────────┘
 ```
 
-| Component     | Role                                                                 |
-|---------------|----------------------------------------------------------------------|
-| `reverse-proxy` | NGINX — serves the built client and routes `/api/urls` by method   |
-| `write-service` | .NET 10 + EF Core — creates short URLs (`POST /api/urls`)           |
-| `read-service`  | .NET 10 + Dapper — resolves short codes to 302 redirects            |
-| `client`      | Astro (TypeScript) — static UI, built into the reverse-proxy image   |
-| `postgres`    | Single `short_urls` table, schema auto-applied on first boot         |
+| Component       | Role                                                                 |
+|-----------------|----------------------------------------------------------------------|
+| `reverse-proxy` | NGINX — serves the built client and routes `/api/urls` by method     |
+| `write-service` | .NET 10 + EF Core — creates short URLs (`POST /api/urls`)            |
+| `read-service`  | .NET 10 + Dapper — resolves short codes to 302 redirects             |
+| `client`        | Astro (TypeScript) — static UI, built into the reverse-proxy image   |
+| `postgres`      | Single `short_urls` table, schema auto-applied on first boot         |
 
 Request flow:
 
@@ -73,7 +78,7 @@ docker compose -f compose.prod.yml up -d --build
 ### Config
 
 - `PUBLIC_API_URL` (reverse-proxy build arg, default `http://localhost`) — base URL the browser uses for API calls. Override it when deploying so the client calls the API on the origin the page is served from, e.g. `PUBLIC_API_URL=https://your-domain docker compose up --build -d` (production reads it from `.env`).
-- Database connection strings are injected into the .NET services via `ConnectionStrings__devDatabase`.
+- Database connection strings are injected into the .NET services via the `db` environment variable (e.g. `Host=database;Database=…;Username=…;Password=…`).
 - Local dev: copy `client/.env.example` to `client/.env` for the Astro dev server.
 
 ## Local development (without Docker)
